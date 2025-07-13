@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Malla Interactiva</title>
+  <style>
+    .curso {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 1px solid black;
+      width: 150px;
+      text-align: center;
+      cursor: pointer;
+      display: inline-block;
+      font-family: sans-serif;
+    }
+    .bloqueado {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .disponible {
+      background-color: #4da6ff;
+    }
+    .completado {
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular Interactiva</h1>
+  <div id="malla"></div>
+
+  <script>
+    const cursos = {
+      'mat1': { nombre: 'Matemática I', prereqs: [], estado: 'disponible' },
+      'fis1': { nombre: 'Física I', prereqs: ['mat1'], estado: 'bloqueado' },
+      'prog1': { nombre: 'Programación I', prereqs: ['mat1'], estado: 'bloqueado' },
+      'prog2': { nombre: 'Programación II', prereqs: ['prog1'], estado: 'bloqueado' },
+      'fis2': { nombre: 'Física II', prereqs: ['fis1'], estado: 'bloqueado' }
+    };
+
+    const mallaDiv = document.getElementById('malla');
+
+    function renderMalla() {
+      mallaDiv.innerHTML = '';
+      for (const id in cursos) {
+        const curso = cursos[id];
+        const div = document.createElement('div');
+        div.className = `curso ${curso.estado}`;
+        div.innerText = curso.nombre;
+        div.onclick = () => marcarCurso(id);
+        mallaDiv.appendChild(div);
+      }
+    }
+
+    function marcarCurso(id) {
+      const curso = cursos[id];
+      if (curso.estado !== 'disponible') return;
+
+      curso.estado = 'completado';
+
+      // Revisar qué cursos se desbloquean
+      for (const cid in cursos) {
+        const c = cursos[cid];
+        if (c.estado === 'bloqueado') {
+          const listo = c.prereqs.every(pr => cursos[pr].estado === 'completado');
+          if (listo) c.estado = 'disponible';
+        }
+      }
+
+      renderMalla();
+    }
+
+    renderMalla();
+  </script>
+</body>
+</html>
