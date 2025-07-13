@@ -1,110 +1,150 @@
-<script>
-  const cursos = {
-    // I CICLO
-    art1: { nombre: "Actividades Artísticas y Deportivas", prereqs: [], ciclo: "I", estado: "disponible" },
-    met1: { nombre: "Taller de Métodos del Estudio Universitario", prereqs: [], ciclo: "I", estado: "disponible" },
-    arg1: { nombre: "Taller de Argumentación Oral y Escrita", prereqs: [], ciclo: "I", estado: "disponible" },
-    hist1: { nombre: "Formación histórica", prereqs: [], ciclo: "I", estado: "disponible" },
-    realnac: { nombre: "Realidad Nacional", prereqs: [], ciclo: "I", estado: "disponible" },
-    biofis: { nombre: "Biofísica", prereqs: [], ciclo: "I", estado: "disponible" },
-    bio1: { nombre: "Biología Celular y Molecular", prereqs: [], ciclo: "I", estado: "disponible" },
-    mat1: { nombre: "Matemática aplicada a la salud", prereqs: [], ciclo: "I", estado: "disponible" },
-    quim1: { nombre: "Química aplicada a la salud", prereqs: [], ciclo: "I", estado: "disponible" },
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Malla Curricular Interactiva - Medicina</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #fff0f5;
+    }
+    h1 {
+      text-align: center;
+      color: #c2185b;
+    }
+    h2 {
+      color: #c2185b;
+      border-bottom: 2px solid #f8bbd0;
+      padding-bottom: 4px;
+      margin-top: 30px;
+    }
+    .curso {
+      padding: 10px;
+      margin: 8px;
+      border-radius: 10px;
+      border: 1px solid #e91e63;
+      width: 220px;
+      text-align: center;
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: top;
+      transition: 0.3s;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    }
+    .disponible {
+      background-color: #fce4ec;
+      color: #880e4f;
+    }
+    .bloqueado {
+      background-color: #f3f3f3;
+      color: #999;
+      cursor: not-allowed;
+    }
+    .completado {
+      background-color: #f8bbd0;
+      color: white;
+    }
+    #reset {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #f06292;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    #reset:hover {
+      background-color: #ec407a;
+    }
+    .ciclo {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Curricular Interactiva - Medicina</h1>
+  <button id="reset">Reiniciar progreso</button>
+  <div id="malla"></div>
+  <script src="cursos.js"></script>
+  <script>
+    const mallaDiv = document.getElementById("malla");
 
-    // II CICLO
-    redac: { nombre: "Taller de Interpretación y Redacción de Textos", prereqs: ["arg1"], ciclo: "II", estado: "bloqueado" },
-    filo: { nombre: "Filosofía y Ética", prereqs: [], ciclo: "II", estado: "disponible" },
-    psic: { nombre: "Psicología general", prereqs: [], ciclo: "II", estado: "disponible" },
-    amb: { nombre: "Recursos Naturales y Medio Ambiente", prereqs: [], ciclo: "II", estado: "disponible" },
-    glob: { nombre: "Globalización e Integración", prereqs: [], ciclo: "II", estado: "disponible" },
-    ing1: { nombre: "Inglés Médico I", prereqs: [], ciclo: "II", estado: "disponible" },
-    salud1: { nombre: "Salud Integral", prereqs: ["mat1"], ciclo: "II", estado: "bloqueado" },
-    emb: { nombre: "Embriología y Genética", prereqs: ["bio1"], ciclo: "II", estado: "bloqueado" },
-    bioest: { nombre: "Bioestadística y Demografía", prereqs: ["mat1"], ciclo: "II", estado: "bloqueado" },
-    quechua: { nombre: "ELECTIVO: Quechua Médico", prereqs: [], ciclo: "II", estado: "disponible" },
-
-    // Puedes continuar agregando el resto de cursos del III al XIV CICLO aquí siguiendo el mismo formato.
-  };
-
-  const mallaDiv = document.getElementById("malla");
-
-  function cargarEstado() {
-    const guardado = localStorage.getItem("estadoCursos");
-    if (guardado) {
-      const estados = JSON.parse(guardado);
-      for (const id in estados) {
-        if (cursos[id]) cursos[id].estado = estados[id];
+    function cargarEstado() {
+      const guardado = localStorage.getItem("estadoCursos");
+      if (guardado) {
+        const estados = JSON.parse(guardado);
+        for (const id in estados) {
+          if (cursos[id]) cursos[id].estado = estados[id];
+        }
       }
     }
-  }
 
-  function guardarEstado() {
-    const estados = {};
-    for (const id in cursos) {
-      estados[id] = cursos[id].estado;
+    function guardarEstado() {
+      const estados = {};
+      for (const id in cursos) {
+        estados[id] = cursos[id].estado;
+      }
+      localStorage.setItem("estadoCursos", JSON.stringify(estados));
     }
-    localStorage.setItem("estadoCursos", JSON.stringify(estados));
-  }
 
-  function renderMalla() {
-    mallaDiv.innerHTML = "";
+    function renderMalla() {
+      mallaDiv.innerHTML = "";
+      const ciclos = {};
+      for (const id in cursos) {
+        const curso = cursos[id];
+        if (!ciclos[curso.ciclo]) ciclos[curso.ciclo] = [];
+        ciclos[curso.ciclo].push({ id, ...curso });
+      }
 
-    // Agrupar cursos por ciclo
-    const ciclos = {};
-    for (const id in cursos) {
+      for (const ciclo in ciclos) {
+        const contenedor = document.createElement("div");
+        contenedor.className = "ciclo";
+
+        const titulo = document.createElement("h2");
+        titulo.innerText = `${ciclo} CICLO`;
+        contenedor.appendChild(titulo);
+
+        for (const curso of ciclos[ciclo]) {
+          const div = document.createElement("div");
+          div.className = `curso ${curso.estado}`;
+          div.innerText = curso.nombre;
+          div.onclick = () => marcarCurso(curso.id);
+          contenedor.appendChild(div);
+        }
+
+        mallaDiv.appendChild(contenedor);
+      }
+    }
+
+    function marcarCurso(id) {
       const curso = cursos[id];
-      if (!ciclos[curso.ciclo]) ciclos[curso.ciclo] = [];
-      ciclos[curso.ciclo].push({ id, ...curso });
-    }
-
-    for (const ciclo in ciclos) {
-      const contenedor = document.createElement("div");
-      contenedor.className = "ciclo";
-
-      const titulo = document.createElement("h2");
-      titulo.innerText = `${ciclo} CICLO`;
-      contenedor.appendChild(titulo);
-
-      for (const curso of ciclos[ciclo]) {
-        const div = document.createElement("div");
-        div.className = `curso ${curso.estado}`;
-        div.innerText = curso.nombre;
-        div.onclick = () => marcarCurso(curso.id);
-        contenedor.appendChild(div);
+      if (curso.estado !== "disponible") return;
+      curso.estado = "completado";
+      for (const cid in cursos) {
+        const c = cursos[cid];
+        if (c.estado === "bloqueado") {
+          const listo = c.prereqs.every(pr => cursos[pr].estado === "completado");
+          if (listo) c.estado = "disponible";
+        }
       }
-
-      mallaDiv.appendChild(contenedor);
+      guardarEstado();
+      renderMalla();
     }
-  }
 
-  function marcarCurso(id) {
-    const curso = cursos[id];
-    if (curso.estado !== "disponible") return;
-
-    curso.estado = "completado";
-
-    for (const cid in cursos) {
-      const c = cursos[cid];
-      if (c.estado === "bloqueado") {
-        const listo = c.prereqs.every(pr => cursos[pr].estado === "completado");
-        if (listo) c.estado = "disponible";
+    document.getElementById("reset").onclick = () => {
+      for (const id in cursos) {
+        cursos[id].estado = cursos[id].prereqs.length ? "bloqueado" : "disponible";
       }
-    }
+      localStorage.removeItem("estadoCursos");
+      renderMalla();
+    };
 
-    guardarEstado();
+    cargarEstado();
     renderMalla();
-  }
-
-  document.getElementById("reset").onclick = () => {
-    for (const id in cursos) {
-      cursos[id].estado = cursos[id].prereqs.length ? "bloqueado" : "disponible";
-    }
-    localStorage.removeItem("estadoCursos");
-    renderMalla();
-  };
-
-  cargarEstado();
-  renderMalla();
-</script>
+  </script>
 </body>
 </html>
