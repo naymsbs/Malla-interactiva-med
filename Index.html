@@ -45,3 +45,99 @@
   <h1>Malla Curricular Interactiva - Medicina</h1>
   <div id="malla"></div>
   <script>
+    const cursos = {
+  art1: { nombre: "Actividades Artísticas y Deportivas", prereqs: [], estado: "disponible" },
+  met1: { nombre: "Taller de Métodos del Estudio", prereqs: [], estado: "disponible" },
+  arg1: { nombre: "Taller de Argumentación Oral y Escrita", prereqs: [], estado: "disponible" },
+  hist1: { nombre: "Formación Histórica", prereqs: [], estado: "disponible" },
+  realnac: { nombre: "Realidad Nacional", prereqs: [], estado: "disponible" },
+  biofis: { nombre: "Biofísica", prereqs: [], estado: "disponible" },
+  bio1: { nombre: "Biología Celular y Molecular", prereqs: [], estado: "disponible" },
+  mat1: { nombre: "Matemática aplicada a la salud", prereqs: [], estado: "disponible" },
+  quim1: { nombre: "Química aplicada a la salud", prereqs: [], estado: "disponible" },
+  redac: { nombre: "Redacción de Textos", prereqs: ["arg1"], estado: "bloqueado" },
+  filo: { nombre: "Filosofía y Ética", prereqs: [], estado: "disponible" },
+  psic1: { nombre: "Psicología General", prereqs: [], estado: "disponible" },
+  amb: { nombre: "Recursos Naturales y Medioambiente", prereqs: [], estado: "disponible" },
+  glob: { nombre: "Globalización e Integración", prereqs: [], estado: "disponible" },
+  ingl1: { nombre: "Inglés Médico I", prereqs: [], estado: "disponible" },
+  salud1: { nombre: "Salud Integral", prereqs: ["mat1"], estado: "bloqueado" },
+  emb: { nombre: "Embriología y Genética", prereqs: ["bio1"], estado: "bloqueado" },
+  bioest: { nombre: "Bioestadística y Demografía", prereqs: ["mat1"], estado: "bloqueado" },
+  quechua: { nombre: "Quechua Médico (Electivo)", prereqs: [], estado: "disponible" },
+  morfo1: { nombre: "Morfofisiología I", prereqs: ["bio1"], estado: "bloqueado" },
+  bioq: { nombre: "Bioquímica", prereqs: ["quim1"], estado: "bloqueado" },
+  soporte: { nombre: "Soporte Prehospitalario", prereqs: ["salud1"], estado: "bloqueado" },
+  ingl2: { nombre: "Inglés Médico II", prereqs: ["ingl1"], estado: "bloqueado" },
+  morfo2: { nombre: "Morfofisiología II", prereqs: ["morfo1"], estado: "bloqueado" },
+  metinv: { nombre: "Metodología de la Investigación", prereqs: ["bioest"], estado: "bloqueado" },
+  micro: { nombre: "Microbiología y Parasitología", prereqs: ["morfo1"], estado: "bloqueado" },
+  aps: { nombre: "Atención Primaria de Salud", prereqs: ["salud1"], estado: "bloqueado" },
+  farma: { nombre: "Farmacología", prereqs: ["morfo2"], estado: "bloqueado" },
+  epid: { nombre: "Epidemiología", prereqs: ["micro"], estado: "bloqueado" },
+  pato1: { nombre: "Patología General", prereqs: ["morfo2"], estado: "bloqueado" },
+  nutri: { nombre: "Nutrición Clínica", prereqs: ["bioq"], estado: "bloqueado" },
+  histmed: { nombre: "Historia de la Medicina", prereqs: ["aps"], estado: "bloqueado" },
+  pato2: { nombre: "Patología Especial", prereqs: ["pato1"], estado: "bloqueado" },
+  introcli: { nombre: "Introducción a la Clínica", prereqs: ["pato1"], estado: "bloqueado" },
+  imagen: { nombre: "Diagnóstico por Imágenes", prereqs: ["pato1"], estado: "bloqueado" },
+  medint1: { nombre: "Medicina Interna I", prereqs: ["introcli"], estado: "bloqueado" },
+  patocli: { nombre: "Patología Clínica", prereqs: ["pato2"], estado: "bloqueado" },
+  estvida: { nombre: "Med. Estilo de Vida", prereqs: ["introcli"], estado: "bloqueado" },
+  saludocup: { nombre: "Salud Ocupacional", prereqs: ["introcli"], estado: "bloqueado" },
+  medint2: { nombre: "Medicina Interna II", prereqs: ["medint1"], estado: "bloqueado" },
+  terapia: { nombre: "Terapéutica Basada en Evidencias", prereqs: ["medint1"], estado: "bloqueado" },
+  geriatria: { nombre: "Geriatría", prereqs: ["medint1"], estado: "bloqueado" },
+  ciru1: { nombre: "Cirugía I", prereqs: ["medint2"], estado: "bloqueado" },
+  bioetica: { nombre: "Bioética y Deontología Médica", prereqs: ["medint2"], estado: "bloqueado" },
+  ciru2: { nombre: "Cirugía II", prereqs: ["ciru1"], estado: "bloqueado" },
+  rehab: { nombre: "Rehabilitación", prereqs: ["ciru1"], estado: "bloqueado" },
+  psiq: { nombre: "Psiquiatría", prereqs: ["medint2"], estado: "bloqueado" },
+  onco: { nombre: "Oncología y Paliativos", prereqs: ["medint2"], estado: "bloqueado" },
+  critico: { nombre: "Paciente Crítico", prereqs: ["ciru1"], estado: "bloqueado" },
+  legal: { nombre: "Medicina Legal", prereqs: ["psiq"], estado: "bloqueado" },
+  gine: { nombre: "Ginecología y Obstetricia", prereqs: ["ciru2"], estado: "bloqueado" },
+  gestion: { nombre: "Gestión en Salud", prereqs: ["epid"], estado: "bloqueado" },
+  inv1: { nombre: "Investigación Médica I", prereqs: ["bioetica"], estado: "bloqueado" },
+  ped: { nombre: "Pediatría", prereqs: ["gine"], estado: "bloqueado" },
+  comunitaria: { nombre: "Salud Comunitaria", prereqs: ["gestion"], estado: "bloqueado" },
+  inv2: { nombre: "Investigación Médica II", prereqs: ["inv1"], estado: "bloqueado" },
+  internado: { nombre: "Internado Médico", prereqs: ["inv2", "ped", "comunitaria"], estado: "bloqueado" },
+  tesis: { nombre: "Trabajo de Investigación", prereqs: ["inv2", "ped", "comunitaria"], estado: "bloqueado" }
+};
+
+const mallaDiv = document.getElementById("malla");
+
+function renderMalla() {
+  mallaDiv.innerHTML = "";
+  for (const id in cursos) {
+    const curso = cursos[id];
+    const div = document.createElement("div");
+    div.className = `curso ${curso.estado}`;
+    div.innerText = curso.nombre;
+    div.onclick = () => marcarCurso(id);
+    mallaDiv.appendChild(div);
+  }
+}
+
+function marcarCurso(id) {
+  const curso = cursos[id];
+  if (curso.estado !== "disponible") return;
+
+  curso.estado = "completado";
+
+  for (const cid in cursos) {
+    const c = cursos[cid];
+    if (c.estado === "bloqueado") {
+      const listo = c.prereqs.every(pr => cursos[pr].estado === "completado");
+      if (listo) c.estado = "disponible";
+    }
+  }
+
+  renderMalla();
+}
+
+renderMalla();
+  </script>
+</body>
+</html>
